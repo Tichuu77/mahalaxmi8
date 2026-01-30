@@ -22,7 +22,7 @@ export function Footer() {
               Delivering premium solutions with excellence and innovation.
             </p>
              <p className="text-white/80  mt-2 text-sm leading-relaxed">
-              MAHA RERA NO. A50300044753
+              MAHA RERA NO. A50400044753
             </p>
           </div>
 
