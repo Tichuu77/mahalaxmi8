@@ -193,7 +193,7 @@ export default function HeroSection() {
             {/* Stats Cards - Mobile Optimized */}
             <div className={`bg-black/60 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-primary/30 hover:border-primary/60 transition-all duration-500 hover:scale-105 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
               <Building2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-secondary mb-2 sm:mb-3" />
-              <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-secondary mb-0.5 sm:mb-1">67+</div>
+              <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-secondary mb-0.5 sm:mb-1">70+</div>
               <div className="text-[10px] sm:text-xs md:text-sm text-primary/70">Completed Projects</div>
             </div>
 

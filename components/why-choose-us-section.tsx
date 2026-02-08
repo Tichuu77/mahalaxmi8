@@ -35,7 +35,7 @@ const reasons = [
     icon: Lightbulb,
     title: "Creative Solutions",
     description: "Tailored approaches for unique challenges",
-    stat: "67+",
+    stat: "70+",
     statLabel: "Projects"
   },
   {
