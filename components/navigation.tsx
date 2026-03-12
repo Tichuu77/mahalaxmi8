@@ -14,6 +14,7 @@ export function Navigation() {
     {label : "Gallery", href : "#gallery"},
     { label: "User Guide", href: "#user-guide" },
     { label: "News", href: "#news" },
+    { label: "Blog", href: "/blog", isPage: true },
     { href: "#testimonials", label: "Testimonials" },
     { href: "#contact", label: "Contact" },
   ]
@@ -35,15 +36,25 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-primary hover:text-secondary/80 transition-colors text-sm font-medium"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.isPage ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-primary hover:text-secondary/80 transition-colors text-sm font-medium"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-primary hover:text-secondary/80 transition-colors text-sm font-medium"
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
           </div>
 
           {/* CTA Button */}
@@ -62,16 +73,27 @@ export function Navigation() {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden pb-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className="block px-4 py-2 text-primary hover:text-secondary/80 hover:bg-white/5 rounded transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.isPage ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-2 text-primary hover:text-secondary/80 hover:bg-white/5 rounded transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-2 text-primary hover:text-secondary/80 hover:bg-white/5 rounded transition-colors"
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
                <Link
                 href="#contact"
                 className="bg-gradient-to-r from-primary to-secondary text-foreground px-6 py-2 rounded-lg font-poppins font-medium text-center hover-lift transition-all duration-300 ease-out"

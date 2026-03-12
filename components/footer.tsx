@@ -1,8 +1,7 @@
-import { Mail, Phone, MapPin } from "lucide-react"
+import Link from "next/link"
+import { Phone, MapPin } from "lucide-react"
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
-
   return (
     <footer className="bg-background border-t-4 border-primary/10 relative overflow-hidden pt-16 pb-8">
       <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,6 +42,9 @@ export function Footer() {
                 </li>
               ))}
             </ul>
+            <Link href="/blog" className="mt-3 inline-block text-primary/60 hover:text-primary transition-colors text-sm">
+              Visit SEO Blog
+            </Link>
           </div>
 
           {/* Resources */}
@@ -88,6 +90,7 @@ export function Footer() {
                 <MapPin size={14} className="text-primary mt-0.5 flex-shrink-0" />
                 <div className="mt-0.5">
                   <span className="block">Nagpur Maharashtra India</span>
+                  <a className="text-secondary hover:underline" href="https://www.google.com/maps" target="_blank" rel="noreferrer">View on Google Maps</a>
                 </div>
               </li>
             </ul>
