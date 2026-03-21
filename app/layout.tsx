@@ -88,6 +88,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-IN">
+      <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17888150548">
+        </script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){window.dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-17888150548');
+      `,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased">
         <Script
           id="local-business-schema"
