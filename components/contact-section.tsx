@@ -1,72 +1,76 @@
-"use client";
+"use client"
 
-import { useState, useCallback } from "react";
-import { Phone, Send, Check, MessageCircle, MapPin } from "lucide-react";
+import { useState, useRef, useCallback } from "react"
+import { Phone, Send, Check, MessageCircle, MapPin } from "lucide-react"
+
+const EMPTY_FORM = { name: "", email: "", subject: "", message: "" }
 
 export default function ContactMobileCompact() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-  const [status, setStatus] = useState<
-    "idle" | "sending" | "success" | "error"
-  >("idle");
+  const [form, setForm] = useState(EMPTY_FORM)
+  const formRef = useRef(EMPTY_FORM)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { name, value } = e.target;
-      setForm((prev) => ({ ...prev, [name]: value }));
+      const { name, value } = e.target
+      setForm((prev) => {
+        const updated = { ...prev, [name]: value }
+        formRef.current = updated
+        return updated
+      })
     },
-    [],
-  );
+    []
+  )
 
-  const handleSubmit = useCallback(async () => {
-    if (!form.name || !form.email || !form.subject || !form.message) {
-      setStatus("error");
-      setTimeout(() => setStatus("idle"), 3000);
-      return;
+const handleSubmit = useCallback(
+  async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setStatus("idle")
+
+    const f = formRef.current
+
+    if (!f.name || !f.email || !f.subject || !f.message) {
+      setStatus("error")
+      setIsSubmitting(false)
+      setTimeout(() => setStatus("idle"), 3000)
+      return
     }
-
-    setStatus("sending");
 
     try {
+      const formData = new FormData()
+      formData.append("access_key", "9bd84126-c6f8-4d7d-abc9-785c58560bb4")
+      formData.append("name", f.name)
+      formData.append("subject", f.subject)
+      formData.append("message", `Name: ${f.name}\nEmail: ${f.email}\nSubject: ${f.subject}\nMessage: ${f.message}`)
+
       const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          access_key: "9bd84126-c6f8-4d7d-abc9-785c58560bb4",
-          name: form.name,
-          subject: form.subject,
-          message: `
-Name: ${form.name}
-Email: ${form.email}
-Subject: ${form.subject}
-Message: ${form.message}
-          `.trim(),
-        }),
-      });
+        body: formData,   // ← no Content-Type header, browser sets it automatically
+      })
 
-      const data = await res.json();
+      const data = await res.json()
 
       if (data.success) {
-        setStatus("success");
-        setForm({ name: "", email: "", subject: "", message: "" });
-        setTimeout(() => setStatus("idle"), 5000);
+        setStatus("success")
+        setForm(EMPTY_FORM)
+        formRef.current = EMPTY_FORM
+        setTimeout(() => setStatus("idle"), 5000)
       } else {
-        setStatus("error");
-        setTimeout(() => setStatus("idle"), 3000);
+        setStatus("error")
+        setTimeout(() => setStatus("idle"), 3000)
       }
     } catch (err) {
-      console.error(err);
-      setStatus("error");
-      setTimeout(() => setStatus("idle"), 3000);
+      console.error(err)
+      setStatus("error")
+      setTimeout(() => setStatus("idle"), 3000)
+    } finally {
+      setIsSubmitting(false)
     }
-  }, [form]);
+  },
+  []
+)
 
   return (
     <section
@@ -85,14 +89,12 @@ Message: ${form.message}
       </div>
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header with Decorative Elements */}
+        {/* Header */}
         <div className="text-center mb-12 md:mb-16">
           <div className="inline-block mb-4">
             <div className="flex items-center gap-3 px-6 py-2 bg-primary/10 rounded-full border-2 border-primary/20">
               <MessageCircle className="w-5 h-5 text-primary" />
-              <span className="text-primary font-bold text-sm">
-                Let's Connect
-              </span>
+              <span className="text-primary font-bold text-sm">Let's Connect</span>
             </div>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-primary mb-3">
@@ -103,7 +105,7 @@ Message: ${form.message}
           </p>
         </div>
 
-        {/* Two Column Layout on Desktop */}
+        {/* Two Column Layout */}
         <div className="grid lg:grid-cols-2 gap-8 md:gap-10">
           {/* Left Side - Contact Info */}
           <div className="space-y-6">
@@ -117,12 +119,8 @@ Message: ${form.message}
                       <Phone className="w-8 h-8 text-white" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-primary/70 font-semibold text-sm mb-1">
-                        Call Us Anytime
-                      </p>
-                      <p className="text-primary font-black text-xl">
-                        +91 7218768295
-                      </p>
+                      <p className="text-primary/70 font-semibold text-sm mb-1">Call Us Anytime</p>
+                      <p className="text-primary font-black text-xl">+91 7218768295</p>
                     </div>
                   </div>
                 </div>
@@ -139,21 +137,13 @@ Message: ${form.message}
                 <div className="relative bg-white/5 backdrop-blur-sm border-2 border-green-500/30 rounded-2xl p-6 hover:border-green-500/60 transition-all">
                   <div className="flex items-center gap-5">
                     <div className="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                      <svg
-                        className="w-9 h-9 text-white"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                      <svg className="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <p className="text-primary/70 font-semibold text-sm mb-1">
-                        Quick Chat
-                      </p>
-                      <p className="text-green-600 font-black text-xl">
-                        WhatsApp Us
-                      </p>
+                      <p className="text-primary/70 font-semibold text-sm mb-1">Quick Chat</p>
+                      <p className="text-green-600 font-black text-xl">WhatsApp Us</p>
                     </div>
                   </div>
                 </div>
@@ -166,12 +156,8 @@ Message: ${form.message}
                     <MapPin className="w-8 h-8 text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-primary/70 font-semibold text-sm mb-1">
-                      Visit Our Office
-                    </p>
-                    <p className="text-primary font-black text-xl">
-                      Nagpur, Maharashtra
-                    </p>
+                    <p className="text-primary/70 font-semibold text-sm mb-1">Visit Our Office</p>
+                    <p className="text-primary font-black text-xl">Nagpur, Maharashtra</p>
                   </div>
                 </div>
               </div>
@@ -183,11 +169,7 @@ Message: ${form.message}
                 <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
                   <Check className="w-6 h-6 text-primary" />
                 </div>
-                <div>
-                  <p className="text-primary font-bold text-base">
-                    Why Choose Us?
-                  </p>
-                </div>
+                <p className="text-primary font-bold text-base">Why Choose Us?</p>
               </div>
               <ul className="space-y-3 text-primary/80 text-sm">
                 <li className="flex items-center gap-2">
@@ -216,33 +198,22 @@ Message: ${form.message}
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto mb-6 shadow-xl">
                       <Check className="w-12 h-12 text-white" />
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-black text-primary mb-3">
-                      Thank You!
-                    </h3>
-                    <p className="text-secondary text-base">
-                      We'll contact you within 2 hours
-                    </p>
+                    <h3 className="text-2xl md:text-3xl font-black text-primary mb-3">Thank You!</h3>
+                    <p className="text-secondary text-base">We'll contact you within 2 hours</p>
                   </div>
                 ) : (
                   <>
                     <div className="mb-6">
-                      <h3 className="text-2xl font-black text-primary mb-2">
-                        Send a Message
-                      </h3>
+                      <h3 className="text-2xl font-black text-primary mb-2">Send a Message</h3>
                       <p className="text-primary/70 text-sm">
-                        Fill out the form below and we'll get back to you
-                        shortly
+                        Fill out the form below and we'll get back to you shortly
                       </p>
                     </div>
 
-                    <div className="space-y-5">
-                      {/* Hidden web3forms bot check */}
-                      <input
-                        type="checkbox"
-                        name="botcheck"
-                        className="hidden"
-                        style={{ display: "none" }}
-                      />
+                    {/* ✅ form onSubmit — same pattern as second component */}
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      <input type="hidden" name="from_name" value="Contact Form Website" />
+                      <input type="checkbox" name="botcheck" className="hidden" style={{ display: "none" }} />
 
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div>
@@ -254,6 +225,7 @@ Message: ${form.message}
                             name="name"
                             value={form.name}
                             onChange={handleChange}
+                            required
                             placeholder="John Doe"
                             className="w-full px-4 py-3.5 rounded-xl bg-white/10 border-2 border-primary/20 text-primary placeholder:text-primary/40 focus:border-primary focus:outline-none text-base transition-all"
                           />
@@ -267,6 +239,7 @@ Message: ${form.message}
                             name="email"
                             value={form.email}
                             onChange={handleChange}
+                            required
                             placeholder="john@example.com"
                             className="w-full px-4 py-3.5 rounded-xl bg-white/10 border-2 border-primary/20 text-primary placeholder:text-primary/40 focus:border-primary focus:outline-none text-base transition-all"
                           />
@@ -282,6 +255,7 @@ Message: ${form.message}
                           name="subject"
                           value={form.subject}
                           onChange={handleChange}
+                          required
                           placeholder="What's this about?"
                           className="w-full px-4 py-3.5 rounded-xl bg-white/10 border-2 border-primary/20 text-primary placeholder:text-primary/40 focus:border-primary focus:outline-none text-base transition-all"
                         />
@@ -296,6 +270,7 @@ Message: ${form.message}
                           value={form.message}
                           onChange={handleChange}
                           rows={5}
+                          required
                           placeholder="Tell us what you need..."
                           className="w-full px-4 py-3.5 rounded-xl bg-white/10 border-2 border-primary/20 text-primary placeholder:text-primary/40 focus:border-primary focus:outline-none text-base transition-all resize-none"
                         />
@@ -310,12 +285,15 @@ Message: ${form.message}
                       )}
 
                       <button
-                        onClick={handleSubmit}
-                        disabled={status === "sending"}
-                        className="w-full py-4 bg-gradient-to-r from-secondary to-secondary bg-size-200 bg-pos-0 hover:bg-pos-100 text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-4 bg-gradient-to-r from-secondary to-secondary text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
                       >
-                        {status === "sending" ? (
-                          <span>Sending...</span>
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Sending...</span>
+                          </>
                         ) : (
                           <>
                             <span>Send Message</span>
@@ -323,7 +301,7 @@ Message: ${form.message}
                           </>
                         )}
                       </button>
-                    </div>
+                    </form>
                   </>
                 )}
               </div>
@@ -352,5 +330,5 @@ Message: ${form.message}
         </div>
       </div>
     </section>
-  );
+  )
 }
